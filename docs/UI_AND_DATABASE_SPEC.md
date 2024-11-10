@@ -51,7 +51,6 @@
 ### Theme and Styling
 - Dark mode (default)
 - Light mode option
-- Color coding for severity levels
 - Responsive design for all screen sizes
 
 ## Open-Source Database Integration
@@ -131,11 +130,10 @@ CREATE TABLE vulnerabilities (
     id TEXT PRIMARY KEY,
     cve_id TEXT,
     description TEXT,
-    severity TEXT,
-    cvss_score REAL,
     affected_components TEXT,
     discovery_date DATE,
-    remediation TEXT
+    remediation TEXT,
+    technical_details TEXT
 );
 
 -- Exploits Table
@@ -145,7 +143,7 @@ CREATE TABLE exploits (
     exploit_type TEXT,
     payload TEXT,
     requirements TEXT,
-    success_rate REAL,
+    reproduction_steps TEXT,
     FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities(id)
 );
 

@@ -77,7 +77,6 @@ class MythrilScanner(SecurityTool):
                 finding = {
                     "title": issue.get("title", "Unknown"),
                     "description": issue.get("description", ""),
-                    "severity": self._map_severity(issue.get("severity", "Unknown")),
                     "swc_id": issue.get("swc-id"),
                     "swc_title": issue.get("swc-title"),
                     "contract": issue.get("contract"),
@@ -91,14 +90,7 @@ class MythrilScanner(SecurityTool):
         return findings
 
     def _map_severity(self, severity: str) -> str:
-        """Map Mythril severity levels to standard levels"""
-        severity_map = {
-            "High": "critical",
-            "Medium": "high",
-            "Low": "medium",
-            "Unknown": "low"
-        }
-        return severity_map.get(severity, "low")
+        pass
 
     async def scan_truffle_project(self, project_path: str) -> List[Dict]:
         """Scan all contracts in a Truffle project"""

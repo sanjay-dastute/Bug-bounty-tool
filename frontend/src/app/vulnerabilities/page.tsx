@@ -6,7 +6,6 @@ import {
   CardContent,
   Grid,
   Typography,
-  Chip,
   Table,
   TableBody,
   TableCell,
@@ -18,10 +17,6 @@ import {
   Collapse,
   TextField,
   InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
   CircularProgress,
   Button,
@@ -30,7 +25,6 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp,
   Search as SearchIcon,
-  FilterList as FilterIcon,
   BugReport,
   Security,
 } from '@mui/icons-material';
@@ -38,34 +32,13 @@ import {
 interface Vulnerability {
   id: string;
   title: string;
-  severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
   type: string;
   target: string;
   description: string;
   tool: string;
   timestamp: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'false_positive';
-  aiRecommendations?: string[];
   details?: Record<string, any>;
-}
-
-function SeverityChip({ severity }: { severity: string }) {
-  const colors: Record<string, any> = {
-    critical: 'error',
-    high: 'error',
-    medium: 'warning',
-    low: 'info',
-    info: 'default',
-  };
-
-  return (
-    <Chip
-      label={severity.toUpperCase()}
-      color={colors[severity]}
-      size="small"
-      sx={{ minWidth: 80 }}
-    />
-  );
+  aiRecommendations?: string[];
 }
 
 function VulnerabilityRow({ vulnerability }: { vulnerability: Vulnerability }) {
@@ -86,30 +59,12 @@ function VulnerabilityRow({ vulnerability }: { vulnerability: Vulnerability }) {
         <TableCell component="th" scope="row">
           {vulnerability.title}
         </TableCell>
-        <TableCell align="center">
-          <SeverityChip severity={vulnerability.severity} />
-        </TableCell>
         <TableCell>{vulnerability.type}</TableCell>
         <TableCell>{vulnerability.target}</TableCell>
         <TableCell>{vulnerability.tool}</TableCell>
-        <TableCell>
-          <Chip
-            label={vulnerability.status.replace('_', ' ').toUpperCase()}
-            color={
-              vulnerability.status === 'resolved'
-                ? 'success'
-                : vulnerability.status === 'in_progress'
-                ? 'warning'
-                : vulnerability.status === 'false_positive'
-                ? 'default'
-                : 'error'
-            }
-            size="small"
-          />
-        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 2 }}>
               <Typography variant="h6" gutterBottom component="div">
@@ -129,9 +84,8 @@ function VulnerabilityRow({ vulnerability }: { vulnerability: Vulnerability }) {
                     {vulnerability.aiRecommendations.map((rec, index) => (
                       <Alert
                         key={index}
-                        severity="info"
-                        sx={{ mb: 1 }}
                         icon={<Security />}
+                        sx={{ mb: 1 }}
                       >
                         {rec}
                       </Alert>
@@ -163,11 +117,7 @@ export default function VulnerabilitiesPage() {
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filters, setFilters] = useState({
-    severity: 'all',
-    status: 'all',
-    search: '',
-  });
+  const [searchFilter, setSearchFilter] = useState('');
 
   useEffect(() => {
     fetchVulnerabilities();
@@ -189,26 +139,16 @@ export default function VulnerabilitiesPage() {
   };
 
   const filteredVulnerabilities = vulnerabilities.filter((vuln) => {
-    const matchesSeverity =
-      filters.severity === 'all' || vuln.severity === filters.severity;
-    const matchesStatus =
-      filters.status === 'all' || vuln.status === filters.status;
     const matchesSearch =
-      filters.search === '' ||
-      vuln.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-      vuln.description.toLowerCase().includes(filters.search.toLowerCase());
+      searchFilter === '' ||
+      vuln.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      vuln.description.toLowerCase().includes(searchFilter.toLowerCase());
 
-    return matchesSeverity && matchesStatus && matchesSearch;
+    return matchesSearch;
   });
 
   const handleExport = () => {
-    const exportData = filteredVulnerabilities.map((vuln) => ({
-      ...vuln,
-      severity: vuln.severity.toUpperCase(),
-      status: vuln.status.replace('_', ' ').toUpperCase(),
-    }));
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+    const blob = new Blob([JSON.stringify(filteredVulnerabilities, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
@@ -242,14 +182,12 @@ export default function VulnerabilitiesPage() {
         <Grid item xs={12}>
           <Paper sx={{ p: 2, mb: 3 }}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Search"
-                  value={filters.search}
-                  onChange={(e) =>
-                    setFilters({ ...filters, search: e.target.value })
-                  }
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -258,48 +196,6 @@ export default function VulnerabilitiesPage() {
                     ),
                   }}
                 />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Severity</InputLabel>
-                  <Select
-                    value={filters.severity}
-                    label="Severity"
-                    onChange={(e) =>
-                      setFilters({ ...filters, severity: e.target.value })
-                    }
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <FilterIcon />
-                      </InputAdornment>
-                    }
-                  >
-                    <MenuItem value="all">All Severities</MenuItem>
-                    <MenuItem value="critical">Critical</MenuItem>
-                    <MenuItem value="high">High</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="low">Low</MenuItem>
-                    <MenuItem value="info">Info</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    value={filters.status}
-                    label="Status"
-                    onChange={(e) =>
-                      setFilters({ ...filters, status: e.target.value })
-                    }
-                  >
-                    <MenuItem value="all">All Statuses</MenuItem>
-                    <MenuItem value="open">Open</MenuItem>
-                    <MenuItem value="in_progress">In Progress</MenuItem>
-                    <MenuItem value="resolved">Resolved</MenuItem>
-                    <MenuItem value="false_positive">False Positive</MenuItem>
-                  </Select>
-                </FormControl>
               </Grid>
             </Grid>
           </Paper>
@@ -319,11 +215,9 @@ export default function VulnerabilitiesPage() {
                   <TableRow>
                     <TableCell />
                     <TableCell>Title</TableCell>
-                    <TableCell align="center">Severity</TableCell>
                     <TableCell>Type</TableCell>
                     <TableCell>Target</TableCell>
                     <TableCell>Tool</TableCell>
-                    <TableCell>Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

@@ -106,14 +106,6 @@ class MobSFScanner(SecurityTool):
         """Parse MobSF scan results"""
         findings = []
 
-        # Security Score
-        if "security_score" in report:
-            findings.append({
-                "type": "security_score",
-                "score": report["security_score"],
-                "severity": "info"
-            })
-
         # Vulnerabilities
         if "vulnerabilities" in report:
             for vuln_type, vulns in report["vulnerabilities"].items():
@@ -122,11 +114,8 @@ class MobSFScanner(SecurityTool):
                         "type": "vulnerability",
                         "category": vuln_type,
                         "name": vuln.get("name", "Unknown"),
-                        "severity": vuln.get("severity", "unknown"),
                         "description": vuln.get("description", ""),
-                        "reference": vuln.get("ref", []),
-                        "cvss": vuln.get("cvss", 0),
-                        "cwe": vuln.get("cwe", "")
+                        "reference": vuln.get("ref", [])
                     }
                     findings.append(finding)
 
@@ -134,8 +123,7 @@ class MobSFScanner(SecurityTool):
         if "permissions" in report:
             findings.append({
                 "type": "permissions",
-                "details": report["permissions"],
-                "severity": "info"
+                "details": report["permissions"]
             })
 
         # Code Analysis
@@ -145,7 +133,6 @@ class MobSFScanner(SecurityTool):
                     "type": "code_analysis",
                     "category": issue.get("category", "Unknown"),
                     "name": issue.get("name", "Unknown"),
-                    "severity": issue.get("severity", "unknown"),
                     "description": issue.get("description", ""),
                     "file": issue.get("file", ""),
                     "line": issue.get("line", 0)

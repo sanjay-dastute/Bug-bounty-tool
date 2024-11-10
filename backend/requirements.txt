@@ -1,0 +1,9 @@
+fastapi==0.115.4
+uvicorn==0.32.0
+pydantic==2.9.2
+python-multipart==0.0.17
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+aiohttp==3.9.3
+mythril==0.24.3
+semgrep==1.50.0
