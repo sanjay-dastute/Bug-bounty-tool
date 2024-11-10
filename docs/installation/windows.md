@@ -1,211 +1,129 @@
 # Windows Installation Guide
 
 ## Prerequisites
-
-### System Requirements
 - Windows 10/11 64-bit
-- Python 3.12 or later
+- Python 3.8 or later
 - Node.js 18 or later
-- Docker Desktop
+- Git for Windows
 - 4GB RAM minimum (8GB recommended)
-- 20GB free disk space
-- Windows Terminal (recommended)
+- 10GB free disk space
 
-### Required Software Installation
+## Quick Installation
 
-1. Install Python:
-   - Download Python 3.12 from [python.org](https://www.python.org/downloads/)
-   - During installation, check "Add Python to PATH"
-   - Verify installation:
-     ```cmd
-     python --version
-     pip --version
-     ```
+1. Install Required Software:
+   - [Python 3.12](https://www.python.org/downloads/) (Check "Add Python to PATH")
+   - [Node.js 18 LTS](https://nodejs.org/) (Accept all defaults)
+   - [Git for Windows](https://git-scm.com/download/win)
+   - [Nmap](https://nmap.org/download.html) (Install WinPcap if prompted)
+   - [Go](https://go.dev/dl/) (Required for some tools)
 
-2. Install Node.js:
-   - Download Node.js 18 LTS from [nodejs.org](https://nodejs.org/)
-   - During installation, accept all defaults
-   - Verify installation:
-     ```cmd
-     node --version
-     npm --version
-     ```
-
-3. Install Docker Desktop:
-   - Download from [docker.com](https://www.docker.com/products/docker-desktop)
-   - Follow installation wizard
-   - Enable WSL 2 if prompted
-   - Start Docker Desktop
-   - Verify installation:
-     ```cmd
-     docker --version
-     docker-compose --version
-     ```
-
-4. Install Nmap:
-   - Download from [nmap.org](https://nmap.org/download.html)
-   - Choose Windows installer
-   - During installation, install WinPcap if prompted
-   - Verify installation:
-     ```cmd
-     nmap --version
-     ```
-
-## Installation Steps
-
-1. Download and Extract:
-   - Download `bug-bounty-tool-win.zip`
-   - Right-click > Extract All
-   - Open Command Prompt as Administrator in extracted folder
-
-2. Set up Backend:
-   ```cmd
-   :: Activate virtual environment
-   cd backend
-   .\venv\Scripts\activate
-
-   :: Install dependencies
-   pip install -r requirements.txt
-   cd ..
-   ```
-
-3. Set up Frontend:
-   ```cmd
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-4. Configure Environment:
-   ```cmd
-   :: Create .env file
-   echo DB_PASSWORD=your_secure_password> .env
-   echo JWT_SECRET=your_jwt_secret>> .env
-   echo MOBSF_API_KEY=your_mobsf_key>> .env
-   ```
-
-5. Start Services:
-   ```cmd
-   :: Start Docker containers
-   docker-compose up -d
-   ```
-
-## Running the Application
-
-### Using Launcher Script
+2. Clone and Install:
 ```cmd
-scripts\launch_windows.bat
+:: Clone repository
+git clone https://github.com/sanjay-dastute/Bug-bounty-tool.git
+cd Bug-bounty-tool
+
+:: Run installation script
+install.bat
 ```
 
-### Manual Startup
-1. Terminal 1 (Backend):
-   ```cmd
-   cd backend
-   .\venv\Scripts\activate
-   python main.py
-   ```
+3. Start the Application:
+```cmd
+:: Terminal 1: Start backend
+cd backend
+python main.py
 
-2. Terminal 2 (Frontend):
-   ```cmd
-   cd frontend
-   npm start
-   ```
+:: Terminal 2: Start frontend
+cd frontend
+npm run dev
+```
 
-Access the application at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
+4. Access the application:
+- Open http://localhost:3000 in your browser
+
+## Manual Installation (If automatic script fails)
+
+1. Install Security Tools:
+```cmd
+:: Go tools
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+go install -v github.com/OWASP/Amass/v3/...@latest
+
+:: Python tools
+pip install mobsf mythril slither-analyzer manticore semgrep frida-tools objection apkleaks prowler scoutsuite
+
+:: Node.js tools
+npm install -g snyk
+```
+
+2. Install Application Dependencies:
+```cmd
+:: Frontend
+cd frontend
+npm install
+
+:: Backend
+cd ../backend
+pip install -r requirements.txt
+```
+
+## Usage
+
+1. Start the Backend:
+```cmd
+cd backend
+python main.py
+```
+
+2. Start the Frontend:
+```cmd
+cd frontend
+npm run dev
+```
+
+3. Access the Web Interface:
+- Open http://localhost:3000 in your browser
+- Follow the scanning guide in docs/usage/scanning_guide.md
 
 ## Troubleshooting
 
-### Common Issues
+1. Python Issues:
+```cmd
+:: Upgrade pip
+python -m pip install --upgrade pip
+:: Reinstall requirements
+pip install -r requirements.txt --no-cache-dir
+```
 
-1. Port Conflicts:
-   ```cmd
-   :: Check ports
-   netstat -ano | findstr :3000
-   netstat -ano | findstr :8000
-   ```
+2. Node.js Issues:
+```cmd
+:: Clear npm cache
+npm cache clean --force
+:: Reinstall dependencies
+rmdir /s /q node_modules
+npm install
+```
 
-2. Docker Issues:
-   - Restart Docker Desktop
-   - Check Docker logs in Docker Desktop
-   - Run:
-     ```cmd
-     docker-compose down
-     docker-compose up -d
-     ```
-
-3. Python Environment Issues:
-   ```cmd
-   :: Recreate virtual environment
-   rmdir /s /q backend\venv
-   python -m venv backend\venv
-   backend\venv\Scripts\activate
-   pip install -r backend\requirements.txt
-   ```
-
-4. Node.js Issues:
-   ```cmd
-   :: Clear npm cache
-   cd frontend
-   npm cache clean --force
-   del /s /q node_modules
-   npm install
-   ```
-
-### Logs Location
-- Backend logs: `backend\logs\`
-- Frontend logs: `frontend\logs\`
-- Docker logs: Docker Desktop Dashboard
-
-## Security Considerations
-
-1. Windows Defender Firewall:
-   - Allow inbound connections for:
-     - Python (Backend)
-     - Node.js (Frontend)
-     - Docker Desktop
-     - Nmap
-
-2. Secure Environment File:
-   - Restrict .env file permissions:
-     ```cmd
-     icacls .env /inheritance:r
-     icacls .env /grant:r "%USERNAME%":F
-     ```
-
-3. Regular Updates:
-   ```cmd
-   :: Update dependencies
-   pip install --upgrade -r backend\requirements.txt
-   cd frontend && npm update && cd ..
-   ```
+3. Permission Issues:
+- Run Command Prompt as Administrator
+- Try using Python virtual environment
 
 ## Uninstallation
 
-1. Stop Services:
-   ```cmd
-   :: Stop Docker containers
-   docker-compose down -v
-   ```
+1. Remove Application:
+```cmd
+rmdir /s /q Bug-bounty-tool
+```
 
-2. Remove Files:
-   ```cmd
-   :: Remove application directory
-   cd ..
-   rmdir /s /q bug-bounty-tool
-   ```
+2. Remove Tools (Optional):
+```cmd
+:: Python tools
+pip uninstall -y mobsf mythril slither-analyzer manticore semgrep frida-tools objection apkleaks prowler scoutsuite
 
-3. Clean Docker (Optional):
-   ```cmd
-   :: Remove Docker images
-   docker rmi opensecurity/mobile-security-framework-mobsf
-   docker rmi postgres:latest
-   ```
+:: Node.js tools
+npm uninstall -g snyk
+```
 
-4. Remove Dependencies (Optional):
-   - Uninstall Docker Desktop
-   - Uninstall Python
-   - Uninstall Node.js
-   - Uninstall Nmap
+For detailed usage instructions, see the [Scanning Guide](../usage/scanning_guide.md).

@@ -1,32 +1,97 @@
-# Bug Bounty Tool - Scanning Guide
+# Bug Bounty Tool - User Guide
 
-This guide covers the usage of all scanning capabilities in the Bug Bounty Tool.
+This guide covers the installation, setup, and usage of all capabilities in the Bug Bounty Tool.
 
 ## Table of Contents
-1. [Web Application Scanning](#web-application-scanning)
-2. [Mobile Application Security](#mobile-application-security)
-3. [API Security Testing](#api-security-testing)
-4. [Source Code Analysis](#source-code-analysis)
-5. [Smart Contract Auditing](#smart-contract-auditing)
-6. [Blockchain Security](#blockchain-security)
-7. [Understanding Results](#understanding-results)
-8. [Best Practices](#best-practices)
+1. [Installation](#installation)
+2. [Getting Started](#getting-started)
+3. [Web Application Scanning](#web-application-scanning)
+4. [Mobile Application Security](#mobile-application-security)
+5. [API Security Testing](#api-security-testing)
+6. [Source Code Analysis](#source-code-analysis)
+7. [Smart Contract Auditing](#smart-contract-auditing)
+8. [Blockchain Security](#blockchain-security)
+9. [Understanding Results](#understanding-results)
+10. [Best Practices](#best-practices)
+
+## Installation
+
+### Prerequisites
+- Python 3.8 or later
+- Node.js 18 or later
+- Go (latest version)
+- Git
+
+### Linux Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sanjay-dastute/Bug-bounty-tool.git
+   cd Bug-bounty-tool
+   ```
+
+2. Run the installation script:
+   ```bash
+   chmod +x install.sh
+   ./install.sh
+   ```
+
+### Windows Installation
+1. Install required software:
+   - Python: https://www.python.org/downloads/ (Check "Add Python to PATH")
+   - Node.js: https://nodejs.org/ (LTS version)
+   - Go: https://go.dev/dl/
+   - Git: https://git-scm.com/download/win
+
+2. Clone and install:
+   ```cmd
+   git clone https://github.com/sanjay-dastute/Bug-bounty-tool.git
+   cd Bug-bounty-tool
+   install.bat
+   ```
+
+## Getting Started
+
+### Starting the Application
+1. Start the backend server:
+   ```bash
+   cd backend
+   python3 main.py  # Use 'python' on Windows
+   ```
+
+2. Start the frontend development server:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+3. Access the application:
+   - Open http://localhost:3000 in your browser
+   - Log in with your credentials
+   - Start a new scan from the dashboard
+
+### Quick Start Guide
+1. Navigate to "New Scan" in the dashboard
+2. Select the type of scan you want to perform
+3. Enter target information
+4. Configure scan options
+5. Start the scan
+6. Monitor progress in real-time
+7. Review results in the dashboard
 
 ## Web Application Scanning
 
-### Quick Start
-1. Navigate to "New Scan" in the dashboard
-2. Select "Web Application" as scan type
-3. Enter target URL
-4. Choose scanning tools:
+### Scanning Options
+1. Select "Web Application" as scan type
+2. Enter target URL
+3. Choose scanning tools:
    - Nmap: Network/port scanning
    - Nuclei: Vulnerability scanning
 
 ### Advanced Options
-- **Scan Depth**:
-  - Quick: Basic vulnerability checks
-  - Normal: Standard security assessment
-  - Deep: Comprehensive vulnerability analysis
+- **Scan Types**:
+  - Quick: Basic system checks
+  - Normal: Standard assessment
+  - Deep: Comprehensive analysis
 
 - **Custom Configurations**:
   ```yaml
@@ -36,10 +101,10 @@ This guide covers the usage of all scanning capabilities in the Bug Bounty Tool.
   concurrency: 25
   ```
 
-### Best Practices
-- Start with quick scan to identify low-hanging fruits
-- Follow up with deep scan on critical endpoints
-- Use custom templates for specific vulnerabilities
+### Recommended Approach
+- Begin with system assessment
+- Follow with comprehensive scan
+- Use custom templates for specific tests
 
 ## Mobile Application Security
 
@@ -164,12 +229,11 @@ This guide covers the usage of all scanning capabilities in the Bug Bounty Tool.
 
 ## Understanding Results
 
-### Severity Levels
-- **Critical**: Immediate action required
-- **High**: Significant security risk
-- **Medium**: Moderate security concern
-- **Low**: Minor security issue
-- **Info**: Informational finding
+### Result Categories
+- **Finding**: Technical details of the discovered issue
+- **Impact**: Business impact of the finding
+- **Remediation**: Steps to address the issue
+- **References**: Related documentation and standards
 
 ### Result Analysis
 1. Review vulnerability summary
@@ -191,14 +255,14 @@ This guide covers the usage of all scanning capabilities in the Bug Bounty Tool.
 2. Follow responsible disclosure
 3. Document findings thoroughly
 4. Validate findings manually
-5. Prioritize critical vulnerabilities
+5. Test systematically
 
 ### Testing Workflow
 1. Reconnaissance
    ```bash
    # Example workflow
-   1. Quick scan for initial assessment
-   2. Deep scan on critical findings
+   1. Initial system assessment
+   2. Comprehensive scan
    3. Manual verification
    4. Documentation
    ```

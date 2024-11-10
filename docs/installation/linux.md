@@ -4,165 +4,142 @@
 
 ### System Requirements
 - Linux-based operating system (Ubuntu 20.04 or later recommended)
-- Python 3.12 or later
+- Python 3.8 or later
 - Node.js 18 or later
-- Docker and Docker Compose
 - 4GB RAM minimum (8GB recommended)
-- 20GB free disk space
+- 10GB free disk space
 
-### Required Dependencies
+## Quick Installation
+
+1. Clone the repository:
 ```bash
-# Update package list
-sudo apt update
-
-# Install system dependencies
-sudo apt install -y \
-    python3.12 \
-    python3.12-venv \
-    python3-pip \
-    nodejs \
-    npm \
-    docker.io \
-    docker-compose \
-    nmap \
-    git
-
-# Start and enable Docker service
-sudo systemctl start docker
-sudo systemctl enable docker
-
-# Add current user to docker group
-sudo usermod -aG docker $USER
+git clone https://github.com/sanjay-dastute/Bug-bounty-tool.git
+cd Bug-bounty-tool
 ```
 
-## Installation Steps
-
-1. Download and extract the application:
+2. Run the installation script:
 ```bash
-unzip bug-bounty-tool-linux.zip
-cd bug-bounty-tool
+chmod +x install.sh
+./install.sh
 ```
 
-2. Set up the backend:
-```bash
-# Activate virtual environment
-source backend/venv/bin/activate
-
-# Install Python dependencies
-pip install -r backend/requirements.txt
-```
-
-3. Set up the frontend:
-```bash
-cd frontend
-npm install
-cd ..
-```
-
-4. Configure environment variables:
-```bash
-# Create .env file
-cat > .env << EOL
-DB_PASSWORD=your_secure_password
-JWT_SECRET=your_jwt_secret
-MOBSF_API_KEY=your_mobsf_key
-EOL
-```
-
-5. Start required services:
-```bash
-# Start PostgreSQL and MobSF containers
-docker-compose up -d
-```
-
-## Running the Application
-
-1. Using the launcher script:
-```bash
-./scripts/launch_linux.sh
-```
-
-2. Manual startup (if needed):
+3. Start the application:
 ```bash
 # Terminal 1: Start backend
-source backend/venv/bin/activate
-python backend/main.py
+cd backend
+python3 main.py
 
 # Terminal 2: Start frontend
 cd frontend
-npm start
+npm run dev
 ```
 
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
+4. Access the application:
+- Open http://localhost:3000 in your browser
+
+## Manual Installation (If automatic script fails)
+
+1. Install system dependencies:
+```bash
+sudo apt-get update
+sudo apt-get install -y python3 python3-pip nodejs npm nmap nikto masscan git curl wget
+```
+
+2. Install Go (required for some tools):
+```bash
+wget https://go.dev/dl/go1.21.8.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.21.8.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+```
+
+3. Install security tools:
+```bash
+# Go tools
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+go install -v github.com/OWASP/Amass/v3/...@latest
+
+# Python tools
+pip3 install mobsf mythril slither-analyzer manticore semgrep frida-tools objection apkleaks prowler scoutsuite
+
+# Node.js tools
+sudo npm install -g snyk
+```
+
+4. Install application dependencies:
+```bash
+# Frontend
+cd frontend
+npm install
+
+# Backend
+cd ../backend
+pip3 install -r requirements.txt
+```
+
+## Usage
+
+1. Start the backend server:
+```bash
+cd backend
+python3 main.py
+```
+
+2. Start the frontend development server:
+```bash
+cd frontend
+npm run dev
+```
+
+3. Access the web interface:
+- Open http://localhost:3000 in your browser
+- Follow the scanning guide in docs/usage/scanning_guide.md
 
 ## Troubleshooting
 
-### Common Issues
-
-1. Port conflicts:
+1. Python Package Issues:
 ```bash
-# Check if ports are in use
-sudo lsof -i :3000
-sudo lsof -i :8000
+pip3 install --upgrade pip
+pip3 install -r requirements.txt --no-cache-dir
 ```
 
-2. Docker issues:
+2. Node.js Issues:
 ```bash
-# Restart Docker service
-sudo systemctl restart docker
-
-# Check Docker logs
-docker-compose logs
+# Clear npm cache
+npm cache clean --force
+# Reinstall dependencies
+rm -rf node_modules
+npm install
 ```
 
-3. Permission issues:
+3. Permission Issues:
 ```bash
-# Fix permissions
-sudo chown -R $USER:$USER .
-chmod +x scripts/launch_linux.sh
-```
+# Fix Python package permissions
+sudo chown -R $USER:$USER ~/.local
 
-### Logs Location
-- Backend logs: `backend/logs/`
-- Frontend logs: `frontend/logs/`
-- Docker logs: Use `docker-compose logs`
-
-## Security Considerations
-
-1. Firewall configuration:
-```bash
-# Allow required ports
-sudo ufw allow 3000/tcp
-sudo ufw allow 8000/tcp
-```
-
-2. Secure the environment file:
-```bash
-chmod 600 .env
-```
-
-3. Regular updates:
-```bash
-# Update dependencies
-pip install --upgrade -r backend/requirements.txt
-cd frontend && npm update && cd ..
+# Fix npm permissions
+sudo chown -R $USER:$USER ~/.npm
 ```
 
 ## Uninstallation
 
-To completely remove the application:
+1. Remove the application:
 ```bash
-# Stop containers
-docker-compose down -v
-
-# Remove files
-cd ..
-rm -rf bug-bounty-tool
-
-# Remove Docker images (optional)
-docker rmi opensecurity/mobile-security-framework-mobsf
-docker rmi postgres:latest
+rm -rf Bug-bounty-tool
 ```
+
+2. Remove installed tools (optional):
+```bash
+# Python tools
+pip3 uninstall -y mobsf mythril slither-analyzer manticore semgrep frida-tools objection apkleaks prowler scoutsuite
+
+# Node.js tools
+sudo npm uninstall -g snyk
+
+# Go tools will remain in $GOPATH/bin
+```
+
+For detailed usage instructions, see the [Scanning Guide](../usage/scanning_guide.md).
